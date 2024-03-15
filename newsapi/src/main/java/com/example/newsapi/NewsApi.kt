@@ -5,6 +5,7 @@ import com.example.newsapi.models.Article
 import com.example.newsapi.models.Language
 import com.example.newsapi.models.Response
 import com.example.newsapi.models.SortBy
+import com.example.newsapi.utils.NewsApiKeyInterceptor
 import kotlinx.serialization.json.Json
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
@@ -30,20 +31,24 @@ interface NewsApi {
 fun NewsApi(
     baseUrl: String,
     okHttpClient: OkHttpClient? = null,
-    json: Json = Json
+    json: Json = Json,
+    apiKey: String
 
 ): NewsApi{
-    return retrofit(baseUrl, okHttpClient, json).create()
+    return retrofit(baseUrl,apiKey, okHttpClient, json).create()
 }
 
 private fun retrofit(
     baseUrl: String,
+    apiKey: String,
     okHttpClient: OkHttpClient? ,
     json: Json
 ): Retrofit {
+
+   val modifiedOkHttpClient = (okHttpClient?.newBuilder()?: OkHttpClient.Builder()).addInterceptor(NewsApiKeyInterceptor(apiKey)).build()
     return  Retrofit.Builder()
         .baseUrl(baseUrl)
-        .run { if (okHttpClient != null) client(okHttpClient) else this }
+        .client(modifiedOkHttpClient)
         .build()
 }
 
