@@ -1,7 +1,7 @@
 package com.example.newsapi
 
 import androidx.annotation.IntRange
-import com.example.newsapi.models.Article
+import com.example.newsapi.models.ArticleDTO
 import com.example.newsapi.models.Language
 import com.example.newsapi.models.Response
 import com.example.newsapi.models.SortBy
@@ -25,7 +25,7 @@ interface NewsApi {
         @Query("pageSize") @IntRange(from = 0 , to = 100) pageSize : Int =100,
         @Query("page")  @IntRange(from = 1) page : Int =1,
 
-        ):Result<Response<Article>>
+        ):Result<Response<ArticleDTO>>
 }
 
 fun NewsApi(
