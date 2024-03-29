@@ -6,7 +6,7 @@ import java.util.Date
 
 @Serializable
 data class ArticleDTO(
-  @SerialName("source") val source: Source,
+  @SerialName("source") val source: SourceDTO,
   @SerialName("author") val author: String,
   @SerialName("title") val title: String,
   @SerialName("description") val description: String,
@@ -15,4 +15,4 @@ data class ArticleDTO(
   @SerialName("publishedAt") val publishedAt: Date,
   @SerialName("content") val content: String,
 
-)
+  )

@@ -3,7 +3,7 @@ package com.example.newsapi
 import androidx.annotation.IntRange
 import com.example.newsapi.models.ArticleDTO
 import com.example.newsapi.models.Language
-import com.example.newsapi.models.Response
+import com.example.newsapi.models.ResponseDTO
 import com.example.newsapi.models.SortBy
 import com.example.newsapi.utils.NewsApiKeyInterceptor
 import kotlinx.serialization.json.Json
@@ -25,7 +25,7 @@ interface NewsApi {
         @Query("pageSize") @IntRange(from = 0 , to = 100) pageSize : Int =100,
         @Query("page")  @IntRange(from = 1) page : Int =1,
 
-        ):Result<Response<ArticleDTO>>
+        ):Result<ResponseDTO<ArticleDTO>>
 }
 
 fun NewsApi(
