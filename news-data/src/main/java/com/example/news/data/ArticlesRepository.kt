@@ -37,7 +37,7 @@ class ArticlesRepository(
        }
     }
 
-    private fun getAllFromServer(): Flow<RequestResult<List<ArticleDBO>>> {
+    private fun getAllFromServer(): Flow<RequestResult<*>> {
         return flow {
 
             emit(api.everything())
@@ -50,16 +50,22 @@ class ArticlesRepository(
                     RequestResult.Error(null)
                 }
             }
-            .filterIsInstance<RequestResult.Success<List<ArticleDTO>>>()
-            .map { requestResult: RequestResult.Success<List<ArticleDTO>> ->
-                requestResult.map { dtos ->
-                    dtos.map { articleDto -> articleDto.toArticlesDbo() }
-
+            .onEach { requestResult ->
+                if (requestResult is RequestResult.Success) {
+                    saveNetResponseToCache(checkNotNull(requestResult.data))
                 }
-            }.onEach { requestResult ->
-                database.articlesDao.insert(requestResult.data)
             }
+
+
+
     }
+
+    private suspend fun saveNetResponseToCache(data: List<ArticleDTO>) {
+        val dbos = data.map { articleDTO -> articleDTO.toArticlesDbo() }
+
+        database.articlesDao.insert(dbos)
+    }
+
     fun getAllFromDatabase(): Flow<RequestResult.Success<List<ArticleDBO>>> {
         return database.articlesDao.getAll().map {
             RequestResult.Success(it)
