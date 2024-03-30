@@ -15,4 +15,6 @@ data class ArticleDTO(
   @SerialName("publishedAt") val publishedAt: Date,
   @SerialName("content") val content: String,
 
-  )
+  ) {
+
+}
