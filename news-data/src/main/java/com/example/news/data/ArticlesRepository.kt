@@ -28,18 +28,8 @@ class ArticlesRepository(
     ): Flow<RequestResult<List<Article>>>{
 
         val cachedAllArticles = getAllFromDatabase()
-            .map { result ->
-                result.map { articlesDbos ->
-                    articlesDbos.map { it.toArticle()
-                    }
-                }
-            }
-        val remoteArticles = getAllFromServer() .map { result: RequestResult<ResponseDTO<ArticleDTO>> ->
-            result.map { responce ->
-                responce.articles.map { it.toArticle()
-                }
-            }
-        }
+
+        val remoteArticles = getAllFromServer()
 
        return cachedAllArticles.combine(remoteArticles, mergeStrategy::merge)
            .flatMapLatest { result ->
@@ -56,28 +46,38 @@ class ArticlesRepository(
 
 
 
-    private fun getAllFromServer(): Flow<RequestResult<ResponseDTO<ArticleDTO>>> {
+    private fun getAllFromServer(): Flow<RequestResult<List<Article>>> {
 
        val apiRequest = flow { emit((api.everything())) }.onEach { result ->
             if(result.isSuccess){
-                saveNetResponseToCache(checkNotNull(result.getOrThrow().articles))
+                saveNetResponseToCache(result.getOrThrow().articles)
             }
 
         }
            .map { it.toRequestResult() }
        val start = flowOf<RequestResult<ResponseDTO<ArticleDTO>>>(RequestResult.InProgress())
-      return  merge(apiRequest,start)
+      return  merge(apiRequest,start).map { result: RequestResult<ResponseDTO<ArticleDTO>> ->
+          result.map { responce ->
+              responce.articles.map { it.toArticle()
+              }
+          }
+      }
 
 
     }
 
-    private fun getAllFromDatabase(): Flow<RequestResult<List<ArticleDBO>>> {
+    private fun getAllFromDatabase(): Flow<RequestResult<List<Article>>> {
 
         val dbRequest = database.articlesDao::getAll.asFlow()
          .map { RequestResult.Success(it) }
         val start = flowOf<RequestResult<List<ArticleDBO>>>(RequestResult.InProgress())
 
-        return merge(start,dbRequest)
+        return merge(start,dbRequest) .map { result ->
+            result.map { articlesDbos ->
+                articlesDbos.map { it.toArticle()
+                }
+            }
+        }
     }
 
     private suspend fun saveNetResponseToCache(data: List<ArticleDTO>) {
@@ -88,6 +88,10 @@ class ArticlesRepository(
     fun search(query: String): Flow<Article>{
         api.everything()
         TODO()
+    }
+
+    fun fetchLatest() : Flow<RequestResult<List<Article>>>{
+        return getAllFromServer()
     }
 }
 
