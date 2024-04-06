@@ -7,7 +7,9 @@ import com.example.newsapi.NewsApi
 import com.example.newsapi.models.ArticleDTO
 import com.example.newsapi.models.ResponseDTO
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
@@ -18,10 +20,12 @@ import kotlinx.coroutines.flow.onEach
 class ArticlesRepository(
     private val database: NewsDatabase,
     private val api: NewsApi,
-    private val requestResponseMergeStrategy: MergeStrategy<List<Article>>
+
 ) {
 
-    fun getAll(): Flow<RequestResult<List<Article>>>{
+    fun getAll(
+        mergeStrategy: MergeStrategy<RequestResult<List<Article>>> = DefaultRequestResponseMergeStrategy()
+    ): Flow<RequestResult<List<Article>>>{
 
         val cachedAllArticles = getAllFromDatabase()
             .map { result ->
@@ -37,12 +41,20 @@ class ArticlesRepository(
             }
         }
 
-       return cachedAllArticles.combine(remoteArticles){ dbos, dtos ->
-            requestResponseMergeStrategy.merge(dbos, dtos
-            )
+       return cachedAllArticles.combine(remoteArticles, mergeStrategy::merge)
+           .flatMapLatest { result ->
+               if (result is RequestResult.Success){
+                   database.articlesDao.observeAll()
+                       .map { dbos-> dbos.map { it.toArticle() } }
+                       .map { RequestResult.Success(it) }
+               }else{
+                   flowOf(result)
+               }
+
+           }
         }
 
-    }
+
 
     private fun getAllFromServer(): Flow<RequestResult<ResponseDTO<ArticleDTO>>> {
 
@@ -60,11 +72,10 @@ class ArticlesRepository(
     }
 
     private fun getAllFromDatabase(): Flow<RequestResult<List<ArticleDBO>>> {
-        val dbRequest = database.articlesDao.getAll().map {
-            RequestResult.Success(it)
-        }
-        val start = flowOf<RequestResult<List<ArticleDBO>>>(RequestResult.InProgress())
 
+        val dbRequest = database.articlesDao::getAll.asFlow()
+         .map { RequestResult.Success(it) }
+        val start = flowOf<RequestResult<List<ArticleDBO>>>(RequestResult.InProgress())
 
         return merge(start,dbRequest)
     }

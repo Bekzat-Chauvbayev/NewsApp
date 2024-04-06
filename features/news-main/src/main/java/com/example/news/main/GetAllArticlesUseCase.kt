@@ -1,11 +1,24 @@
 package com.example.news.main
 
 import com.example.news.data.ArticlesRepository
+import com.example.news.data.RequestResult
+import com.example.news.data.map
 import com.example.news.data.model.Article
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
+import com.example.news.data.model.Article as DataArticle
 
 class GetAllArticlesUseCase(private val repository: ArticlesRepository) {
-    operator suspend fun invoke() : Flow<List<Article>> {
-        return repository.getAll()
+    operator  fun invoke() : Flow<RequestResult<List<Article>>> {
+        return repository.getAll().map {
+            requestResult-> requestResult.map {
+                articles -> articles.map { it.toUiArticle() }
+        }
+        }
     }
+}
+private fun DataArticle.toUiArticle() :Article{
+   Article(
+
+   )
 }

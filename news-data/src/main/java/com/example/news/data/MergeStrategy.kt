@@ -42,6 +42,6 @@ internal class DefaultRequestResponseMergeStrategy<T:Any>: MergeStrategy<Request
     private fun merge(
         cache: RequestResult.Success<T>,
         server: RequestResult.Error<T>): RequestResult<T> {
-        return RequestResult.Error(cache.data)
+        return RequestResult.Error(cache.data, error = server.error)
     }
 }
