@@ -8,6 +8,10 @@ internal fun ArticleDBO.toArticle() : Article{
     TODO()
 }
 
+internal fun ArticleDTO.toArticle() : Article{
+    TODO()
+}
+
 internal fun ArticleDTO.toArticlesDbo() :ArticleDBO {
     TODO()
 }
