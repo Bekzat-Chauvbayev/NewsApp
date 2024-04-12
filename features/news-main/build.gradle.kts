@@ -60,6 +60,7 @@ dependencies {
 
 
     implementation("androidx.room:room-ktx:2.6.1")
+    implementation("jakarta.inject:jakarta.inject-api:2.0.1")
 
     implementation(project(":news-data"))
     implementation("com.google.dagger:hilt-android:2.44")

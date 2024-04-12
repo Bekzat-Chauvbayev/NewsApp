@@ -18,7 +18,5 @@ class GetAllArticlesUseCase(private val repository: ArticlesRepository) {
     }
 }
 private fun DataArticle.toUiArticle() :Article{
-   Article(
-
-   )
+   TODO()
 }
