@@ -17,8 +17,7 @@ internal class NewsMainViewModel @Inject constructor(
      getAllArticlesUseCase: Provider<GetAllArticlesUseCase>,
 ) : ViewModel() {
 
-    val state: StateFlow<State> = getAllArticlesUseCase.get().invoke()
-        .map { it.toState() }.stateIn(viewModelScope, SharingStarted.Lazily, State.None) as StateFlow<State>
+    val state: StateFlow<State> = getAllArticlesUseCase.get().invoke().map { it.toState() }.stateIn(viewModelScope, SharingStarted.Lazily, State.None) as StateFlow<State>
 
 
     fun forceUpdate(){
@@ -28,7 +27,7 @@ internal class NewsMainViewModel @Inject constructor(
 
 
 
-fun  RequestResult<List<com.example.news.data.model.Article>>.toState():State {
+internal fun  RequestResult<List<ArticleUI>>.toState():State {
     return when(this){
         is RequestResult.Error ->State.Error(data)
         is RequestResult.InProgress -> State.Loading(data)
@@ -42,9 +41,9 @@ fun  RequestResult<List<com.example.news.data.model.Article>>.toState():State {
 
 
 
-sealed class State{
+internal sealed class State{
     object None: State()
-    class Loading(val articles: List<com.example.news.data.model.Article>? = null): State()
-    class Error(val articles: List<com.example.news.data.model.Article>? = null): State()
-    class Success(val articles: List<Article>): State()
+    class Loading(val articles: List<ArticleUI>? = null): State()
+    class Error(val articles: List<ArticleUI>? = null): State()
+    class Success(val articles: List<ArticleUI>): State()
 }

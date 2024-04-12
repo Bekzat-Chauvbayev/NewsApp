@@ -12,7 +12,7 @@ android {
     defaultConfig {
         applicationId = "com.example.searchnews"
         minSdk = 24
-        targetSdk = 34
+        targetSdk = 33
         versionCode = 1
         versionName = "1.0"
 
@@ -77,4 +77,5 @@ dependencies {
     implementation(project(":news-data"))
     implementation(project(":newsapi"))
     implementation(project(":database"))
+    implementation(project(":news-common"))
 }
