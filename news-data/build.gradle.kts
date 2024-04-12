@@ -42,4 +42,7 @@ dependencies {
     implementation(project(":database"))
     implementation(project(":newsapi"))
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
+    implementation ("androidx.annotation:annotation:1.7.1")
+    implementation("jakarta.inject:jakarta.inject-api:2.0.1")
+
 }
