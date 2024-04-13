@@ -58,7 +58,12 @@ class ArticlesRepository @Inject constructor(
                 saveNetResponseToCache(result.getOrThrow().articles)
             }
 
-        }
+
+        }.onEach {
+            result -> if (result.isFailure){
+           logger.e(LOG_TAG, "Error getting from database = ${result.exceptionOrNull()}")
+       }
+       }
            .map { it.toRequestResult() }
        val start = flowOf<RequestResult<ResponseDTO<ArticleDTO>>>(RequestResult.InProgress())
       return  merge(apiRequest,start).map { result: RequestResult<ResponseDTO<ArticleDTO>> ->
@@ -76,6 +81,8 @@ class ArticlesRepository @Inject constructor(
         val dbRequest = database.articlesDao::getAll.asFlow()
          .map { RequestResult.Success(it) }.catch {
              RequestResult.Error<List<ArticleDBO>>(error = it)
+                logger.e(LOG_TAG, "Error getting from database = $it")
+
             }
         val start = flowOf<RequestResult<List<ArticleDBO>>>(RequestResult.InProgress())
 
@@ -85,6 +92,10 @@ class ArticlesRepository @Inject constructor(
                 }
             }
         }
+
+    }
+    private companion object{
+        const val LOG_TAG = "ArticlesRepository"
     }
 
     private suspend fun saveNetResponseToCache(data: List<ArticleDTO>) {
