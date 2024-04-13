@@ -24,8 +24,8 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_19
+        targetCompatibility = JavaVersion.VERSION_19
     }
     kotlinOptions {
         jvmTarget = "1.8"
@@ -41,8 +41,10 @@ dependencies {
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     implementation(project(":database"))
     implementation(project(":newsapi"))
+    implementation(project(":news-common"))
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
     implementation ("androidx.annotation:annotation:1.7.1")
     implementation("jakarta.inject:jakarta.inject-api:2.0.1")
+
 
 }

@@ -3,15 +3,14 @@ package com.example.news.main
 import com.example.news.data.ArticlesRepository
 import com.example.news.data.RequestResult
 import com.example.news.data.map
-import com.example.news.data.model.Article
 import jakarta.inject.Inject
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import com.example.news.data.model.Article as DataArticle
 
-class GetAllArticlesUseCase @Inject constructor(
+internal class GetAllArticlesUseCase @Inject constructor(
     private val repository: ArticlesRepository) {
-    operator  fun invoke() : Flow<RequestResult<List<Article>>> {
+    operator  fun invoke() : Flow<RequestResult<List<ArticleUI>>> {
         return repository.getAll().map {
             requestResult-> requestResult.map {
                 articles -> articles.map { it.toUiArticle() }
@@ -19,6 +18,12 @@ class GetAllArticlesUseCase @Inject constructor(
         }
     }
 }
-private fun DataArticle.toUiArticle() :Article{
-   TODO()
+private fun DataArticle.toUiArticle() :ArticleUI{
+   return ArticleUI(
+       id = id,
+       title= title,
+       description = description,
+       imageUrl = urlToImage,
+       url = url
+   )
 }

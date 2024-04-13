@@ -1,5 +1,6 @@
 package com.example.news.data
 
+import com.example.news.common.Logger
 import com.example.news.data.model.Article
 import com.example.news.database.NewsDatabase
 import com.example.news.database.models.ArticleDBO
@@ -7,9 +8,9 @@ import com.example.newsapi.NewsApi
 import com.example.newsapi.models.ArticleDTO
 import com.example.newsapi.models.ResponseDTO
 import jakarta.inject.Inject
-import jakarta.inject.Singleton
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.asFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
@@ -23,8 +24,9 @@ import kotlinx.coroutines.flow.onEach
 class ArticlesRepository @Inject constructor(
     private val database: NewsDatabase,
     private val api: NewsApi,
+    private val logger: Logger,
 
-) {
+    ) {
 
     fun getAll(
         mergeStrategy: MergeStrategy<RequestResult<List<Article>>> = DefaultRequestResponseMergeStrategy()
@@ -72,7 +74,9 @@ class ArticlesRepository @Inject constructor(
     private fun getAllFromDatabase(): Flow<RequestResult<List<Article>>> {
 
         val dbRequest = database.articlesDao::getAll.asFlow()
-         .map { RequestResult.Success(it) }
+         .map { RequestResult.Success(it) }.catch {
+             RequestResult.Error<List<ArticleDBO>>(error = it)
+            }
         val start = flowOf<RequestResult<List<ArticleDBO>>>(RequestResult.InProgress())
 
         return merge(start,dbRequest) .map { result ->

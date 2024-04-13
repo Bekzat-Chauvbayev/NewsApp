@@ -12,9 +12,11 @@ internal class DefaultRequestResponseMergeStrategy<T:Any>: MergeStrategy<Request
             right is RequestResult.Success && left is RequestResult.InProgress -> merge(right,left)
             right is RequestResult.InProgress && left is RequestResult.Success -> merge(right,left)
             right is RequestResult.Success && left is RequestResult.Error -> merge(right,left)
+            right is RequestResult.InProgress && left is RequestResult.Error -> merge(right,left)
             else -> error("fsdf")
         }
     }
+
     private fun merge(
         cache: RequestResult.InProgress<T>,
         server: RequestResult.InProgress<T>): RequestResult<T> {
@@ -26,13 +28,13 @@ internal class DefaultRequestResponseMergeStrategy<T:Any>: MergeStrategy<Request
         }
         
     }
-
+    @Suppress("UNUSED_PARAMETER")
     private fun merge(
         cache: RequestResult.Success<T>,
         server: RequestResult.InProgress<T>): RequestResult<T> {
         return RequestResult.InProgress(cache.data)
     }
-
+    @Suppress("UNUSED_PARAMETER")
     private fun merge(
         cache: RequestResult.InProgress<T>,
         server: RequestResult.Success<T>): RequestResult<T> {
@@ -43,5 +45,10 @@ internal class DefaultRequestResponseMergeStrategy<T:Any>: MergeStrategy<Request
         cache: RequestResult.Success<T>,
         server: RequestResult.Error<T>): RequestResult<T> {
         return RequestResult.Error(cache.data, error = server.error)
+    }
+    private fun merge(
+        cache: RequestResult.InProgress<T>,
+        server: RequestResult.Error<T>): RequestResult<T> {
+        return RequestResult.Error(server.data?: cache.data, error = server.error)
     }
 }

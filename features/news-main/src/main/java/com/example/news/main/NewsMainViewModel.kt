@@ -25,6 +25,9 @@ internal class NewsMainViewModel @Inject constructor(
     }
 }
 
+private fun <E> RequestResult<E>.toState() {
+    TODO("Not yet implemented")
+}
 
 
 internal fun  RequestResult<List<ArticleUI>>.toState():State {
