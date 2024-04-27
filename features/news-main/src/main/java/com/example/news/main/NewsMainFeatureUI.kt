@@ -21,6 +21,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
@@ -31,6 +33,7 @@ import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
+import coil.compose.AsyncImagePainter
 
 
 @Composable
@@ -100,7 +103,7 @@ private fun ProgressIndicator(state: State.Loading){
 private fun Articles(
     @PreviewParameter(ArticlesPreviewProvider::class, limit = 1)articles: List<ArticleUI>,
 ){
-    LazyColumn(contentPadding = PaddingValues(bottom = 4.dp)) {
+    LazyColumn {
         items(articles){article ->
             key(article.id){
                 Article(article = article)
@@ -118,14 +121,23 @@ private fun Articles(
 internal fun Article(
     @PreviewParameter(ArticlePreviewProvider::class, limit = 1)article: ArticleUI,
 ) {
-    Row {
+    Row (Modifier.padding(bottom = 4.dp)){
         article.imageUrl?.let { imageUrl ->
-            AsyncImage(
-                model = imageUrl,
-                contentDescription = stringResource(R.string.content_desc_item_article_image),
-                contentScale = ContentScale.None,
-                modifier = Modifier.heightIn(150.dp).widthIn(max = 150.dp)
-            )
+            var isImageVisible by mutableStateOf(true)
+            if (isImageVisible) {
+                AsyncImage(
+                    model = imageUrl,
+                    onState = { state ->
+                        if (state is AsyncImagePainter.State.Error) {
+                            isImageVisible = false
+                        }
+                    },
+                    contentDescription = stringResource(R.string.content_desc_item_article_image),
+                    contentScale = ContentScale.None,
+
+                    modifier = Modifier.size(150.dp)
+                )
+            }
         }
         Spacer(modifier = Modifier.size(4.dp))
         Column(modifier = Modifier.padding(8.dp)) {
