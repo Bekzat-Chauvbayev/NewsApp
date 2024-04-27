@@ -1,0 +1,8 @@
+name: code quality check
+run-name: Check code quality with linter
+on: [push]
+jobs:
+    Detect:
+        runs-on: ubuntu-latest
+        steps:
+            - run: .gradlew detect
