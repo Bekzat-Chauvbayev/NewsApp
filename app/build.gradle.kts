@@ -75,7 +75,7 @@ dependencies {
     implementation(project(":news-uikit"))
 
     debugImplementation(libs.okhttp.logging.interceptor)
-//dsadasdadadss
+
 
 
 }

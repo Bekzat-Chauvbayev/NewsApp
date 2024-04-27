@@ -21,7 +21,7 @@ internal class NewsMainVIewModel @Inject constructor(
         .stateIn(viewModelScope, SharingStarted.Lazily,State.None)
 
     fun forceUpdate(){
-
+        TODO()
     }
 
 
